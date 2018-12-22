@@ -1,0 +1,122 @@
+//persistentarray
+#include<iostream>
+#include<cstdio>
+using namespace std;
+const int N=1e6+6;
+const int S=2e7+7;
+
+int n,m,a[N];
+struct persistenttree{
+	int sm,rt[N];				//root
+	int cnt,v[S];
+	int c[S][2];				//child
+	int in[S][2];				//interval
+	int bld(int l,int r){
+		if(l>r)return 0;
+		int u=++cnt,mid=(l+r)>>1;
+		c[u][0]=bld(l,mid-1);
+		c[u][1]=bld(mid+1,r);
+		in[u][0]=l;in[u][1]=r;
+		v[u]=a[mid];
+		return u;
+	}
+	void init(){
+		for(int i=1;i<=n;i++)
+			scanf("%d",&a[i]);
+		rt[sm]=bld(1,n);
+	}
+	int fnd(int l,int x){
+		int u=rt[l];
+		++sm;rt[sm]=rt[l];
+		while(x!=(in[u][0]+in[u][1])>>1){
+			if(in[c[u][0]][1]>=x)u=c[u][0];
+			else u=c[u][1];
+		}
+		return v[u];
+	}
+	void chng(int l,int x,int y){
+		++sm;++cnt;rt[sm]=cnt;
+		int u=rt[l],p=rt[sm];
+		v[p]=v[u];in[p][0]=in[u][0];in[p][1]=in[u][1];
+		while(x!=(in[u][0]+in[u][1])>>1){
+			if(in[c[u][0]][1]>=x){
+				++cnt;c[p][0]=cnt;c[p][1]=c[u][1];
+				u=c[u][0];
+				p=cnt;v[p]=v[u];in[p][0]=in[u][0];in[p][1]=in[u][1];
+			}
+			else{
+				++cnt;c[p][0]=c[u][0];c[p][1]=cnt;
+				u=c[u][1];
+				p=cnt;v[p]=v[u];in[p][0]=in[u][0];in[p][1]=in[u][1];
+			}
+		}
+		v[p]=y;c[p][0]=c[u][0];c[p][1]=c[u][1];
+	}
+}prsarr;
+struct persistenttrie{
+	int sm,rt[N];
+	int cnt,v[S];
+	int c[S][2];
+	int in[S][2];
+	int bld(int l,int r){
+		int u=++cnt,mid=(l+r)>>1;
+		in[u][0]=l;in[u][1]=r;
+		if(l==r){
+			v[u]=a[mid];
+			return u;
+		}
+		c[u][0]=bld(l,mid);
+		c[u][1]=bld(mid+1,r);
+		return u;
+	}
+	void init(){
+		for(int i=1;i<=n;i++)
+			scanf("%d",&a[i]);
+		rt[sm]=bld(1,n);
+	}
+	int fnd(int l,int x){
+		int u=rt[l];
+		++sm;rt[sm]=rt[l];
+		while(in[u][0]!=in[u][1]){
+			if(in[c[u][0]][1]>=x)u=c[u][0];
+			else u=c[u][1];
+		}
+		return v[u];
+	}
+	void chng(int l,int x,int y){
+		++sm;++cnt;rt[sm]=cnt;
+		int u=rt[l],p=rt[sm];
+		in[p][0]=in[u][0];in[p][1]=in[u][1];
+		while(in[u][0]!=in[u][1]){
+			if(in[c[u][0]][1]>=x){
+				++cnt;c[p][0]=cnt;c[p][1]=c[u][1];
+				u=c[u][0];
+				p=cnt;in[p][0]=in[u][0];in[p][1]=in[u][1];
+			}
+			else{
+				++cnt;c[p][0]=c[u][0];c[p][1]=cnt;
+				u=c[u][1];
+				p=cnt;in[p][0]=in[u][0];in[p][1]=in[u][1];
+			}
+		}
+		v[p]=y;
+	}
+}_prsarr;
+
+int main()
+{
+	int i,l,x,y,o;
+	scanf("%d%d",&n,&m);
+	_prsarr.init();
+	for(i=1;i<=m;i++){
+		scanf("%d%d%d",&l,&o,&x);
+		if(o==1){
+			scanf("%d",&y);
+			_prsarr.chng(l,x,y);
+		}
+		else{
+			printf("%d\n",_prsarr.fnd(l,x));
+		}
+	}
+	return 0;
+}
