@@ -1,0 +1,87 @@
+//Aho-Corasick automation
+#include<iostream>
+#include<cstring>
+#include<cstdio>
+using namespace std;
+const int S=10504;
+const int N=152;
+const int L0=1e6+1;
+const int L=71;
+
+struct acm{
+	int cnt,hd,tl;
+	int nxt[S][26],fl[S],sm[S],q[S],ps[N];
+	char ch[N][L],str[L0];
+	void clear(){
+		cnt=1;
+		int i;
+		memset(nxt,0,sizeof(nxt));
+		memset(sm,0,sizeof(sm));
+		for(i=0;i<26;i++)
+			nxt[0][i]=1;
+	}
+	void insrt(int t){
+		cin>>ch[t];
+		int l=strlen(ch[t]);
+		int nw=1;
+		for(int i=0;i<l;i++){
+			if(!nxt[nw][ch[t][i]-'a'])nxt[nw][ch[t][i]-'a']=++cnt;
+			nw=nxt[nw][ch[t][i]-'a'];
+		}
+		ps[t]=nw;
+	}
+	void bldfl(){
+		hd=0,tl=1;
+		q[0]=1;
+		int nw,i,v;
+		while(hd!=tl){
+			nw=q[hd];++hd;
+			for(i=0;i<26;i++){
+				v=nxt[nw][i];
+				if(v){
+					fl[v]=nxt[fl[nw]][i];
+					q[tl]=v;++tl;
+				}
+				else{
+					nxt[nw][i]=nxt[fl[nw]][i];
+				}
+			}
+		}
+	}
+	void jmp(){
+		cin>>str;
+		int l=strlen(str);
+		int nw=1;
+		for(int i=0;i<l;i++){
+			nw=nxt[nw][str[i]-'a'];
+			++sm[nw];
+		}
+	}
+	void count(){
+		for(int i=tl-1;i>=0;i--)
+			sm[fl[q[i]]]+=sm[q[i]];
+	}
+}acm;
+
+int main()
+{
+	int n,i;
+	cin>>n;
+	while(n){
+		acm.clear();
+		for(i=0;i<n;i++)
+			acm.insrt(i);
+		acm.bldfl();
+		acm.jmp();
+		acm.count();
+		int ans=0;
+		for(i=0;i<n;i++)
+			ans=max(ans,acm.sm[acm.ps[i]]);
+		cout<<ans<<'\n';
+		for(i=0;i<n;i++)
+			if(acm.sm[acm.ps[i]]==ans)
+				cout<<acm.ch[i]<<'\n';
+		cin>>n;
+	}
+	return 0;
+}
