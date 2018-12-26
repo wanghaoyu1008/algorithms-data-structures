@@ -1,0 +1,148 @@
+//Splay
+//LuoguP3369
+#include<iostream>
+#include<cstdio>
+using namespace std;
+const int N=1e5+5;
+const int INF=1e9+7;
+
+struct splay{
+	int rt;
+	int cnt,c[N][2],nm[N],sm[N],f[N],s[N],lzy[N];
+	splay(){
+		cnt=2;rt=1;
+		c[1][1]=2;nm[1]=-INF;
+		f[2]=1;nm[2]=INF;
+	}
+	void psh(int v){
+		if(c[v][0])lzy[c[v][0]]^=lzy[v];
+		if(c[v][1])lzy[c[v][1]]^=lzy[v];
+		if(lzy[v]){swap(c[v][0],c[v][1]);lzy[v]=0;}
+	}
+	void updt(int v){
+		s[v]=s[c[v][0]]+s[c[v][1]]+sm[v];
+	}
+	void rtt(int v){								//rotate
+		int p=f[v],w=(v==c[p][1]);
+		psh(p);psh(v);
+		if(f[p])c[f[p]][p==c[f[p]][1]]=v;
+		f[v]=f[p];
+		c[p][w]=c[v][w^1];
+		if(c[v][w^1])f[c[v][w^1]]=p;
+		c[v][w^1]=p;
+		f[p]=v;
+		updt(p);updt(v);
+	}
+	void sply(int v,int gl){						//splay
+		psh(v);
+		int p,g;
+		while(f[v]!=gl){
+			p=f[v];g=f[p];
+			if(g)psh(g);psh(p);psh(v);
+			if(g!=gl&&(v==c[p][1])==(p==c[g][1]))rtt(p);
+			rtt(v);
+		}
+		if(gl==0)rt=v;
+	}
+	int fnd(int x){									//search by key(find)
+		int v=rt;
+		while(nm[v]!=x){
+			psh(v);
+			if(x<nm[v]){
+				if(c[v][0])v=c[v][0];
+				else break;
+			}
+			else{
+				if(c[v][1])v=c[v][1];
+				else break;
+			}
+		}
+		return v;
+	}
+	int lct(int k){									//search by rank(locate)
+		int v=rt;
+		while(1){
+			psh(v);
+			if(s[c[v][0]]<k&&k<=s[c[v][0]]+sm[v])break;
+			if(s[c[v][0]]>=k)v=c[v][0];
+			else{k-=s[c[v][0]]+sm[v];v=c[v][1];}
+		}
+		return v;
+	}
+	int prev(int v){
+		psh(v);
+		v=c[v][0];psh(v);
+		while(c[v][1]){
+			v=c[v][1];psh(v);
+		}
+		return v;
+	}
+	int succ(int v){
+		psh(v);
+		v=c[v][1];psh(v);
+		while(c[v][0]){
+			v=c[v][0];psh(v);
+		}
+		return v;
+	}
+	int lwrbnd(int x){								//lower_bound
+		int v=fnd(x);sply(v,0);
+		if(nm[v]<x)v=succ(v);
+		return v;
+	}
+	int upprbnd(int x){								//upper_bound
+		int v=fnd(x);sply(v,0);
+		if(nm[v]<=x)v=succ(v);
+		return v;
+	}
+	void insrt(int x){								//insert
+		int v=lwrbnd(x);sply(v,0);
+		if(x==nm[v]){++sm[v];updt(v);}
+		else{
+			v=prev(v);
+			++cnt;c[v][1]=cnt;f[cnt]=v;
+			sm[cnt]=1;nm[cnt]=x;
+			sply(cnt,0);
+		}
+	}
+	void dlt(int x){								//delete
+		int v=fnd(x);sply(v,0);
+		if(nm[v]!=x)return;
+		--sm[v];updt(v);
+		if(!sm[v]){
+			int u=prev(v);sply(u,v);
+			c[u][1]=c[v][1];f[c[v][1]]=u;
+			f[u]=0;rt=u;updt(u);
+		}
+	}
+	void rvrs(int l,int r){							//reverse
+		int vl=prev(lct(l)),vr=succ(lct(r));
+		sply(vl,0);sply(vr,rt);
+		if(c[vr][0])lzy[c[vr][0]]^=1;
+	}
+	void bld(){										//build
+	}
+	void dfs(int v){
+		psh(v);
+		if(c[v][0])dfs(c[v][0]);
+		printf("%d ",nm[v]);
+		if(c[v][1])dfs(c[v][1]);
+	}
+}sply;
+
+int main()
+{
+	int n,i,o,x,v;
+	scanf("%d",&n);
+	for(i=1;i<=n;i++){
+		scanf("%d%d",&o,&x);
+		if(o==1)sply.insrt(x);
+		if(o==2)sply.dlt(x);
+		if(o==3){v=sply.lwrbnd(x);sply.sply(v,0);printf("%d\n",sply.s[sply.c[v][0]]+1);}
+		if(o==4){v=sply.lct(x);sply.sply(v,0);printf("%d\n",sply.nm[v]);}
+		if(o==5){v=sply.lwrbnd(x);sply.sply(v,0);v=sply.prev(v);sply.sply(v,0);printf("%d\n",sply.nm[v]);}
+		if(o==6){v=sply.upprbnd(x);sply.sply(v,0);printf("%d\n",sply.nm[v]);}
+		if(o==7){sply.dfs(sply.rt);printf("\n");}
+	}
+	return 0;
+}
