@@ -1,5 +1,5 @@
 //Splay
-//LuoguP3369
+//LuoguP3369&&LuoguP3391
 #include<iostream>
 #include<cstdio>
 using namespace std;
@@ -70,7 +70,7 @@ struct splay{
 		return v;
 	}
 	int prev(int v){
-		psh(v);
+		sply(v,0);
 		v=c[v][0];psh(v);
 		while(c[v][1]){
 			v=c[v][1];psh(v);
@@ -78,7 +78,7 @@ struct splay{
 		return v;
 	}
 	int succ(int v){
-		psh(v);
+		sply(v,0);
 		v=c[v][1];psh(v);
 		while(c[v][0]){
 			v=c[v][0];psh(v);
@@ -130,7 +130,7 @@ struct splay{
 	}
 }sply;
 
-int main()
+int main()//LuoguP3369
 {
 	int n,i,o,x,v;
 	scanf("%d",&n);
@@ -146,3 +146,19 @@ int main()
 	}
 	return 0;
 }
+
+/*
+int main()//LuoguP3391
+{
+	int n,m,i,u,v;
+	scanf("%d%d",&n,&m);
+	for(i=1;i<=n;i++)
+		sply.insrt(i);
+	for(i=1;i<=m;i++){
+		scanf("%d%d",&u,&v);
+		sply.rvrs(u,v);
+	}
+	sply.dfs(sply.rt);
+	return 0;
+}
+*/
