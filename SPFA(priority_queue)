@@ -1,0 +1,47 @@
+//SPFA with priority_queue
+//LuoguP4779
+#include<iostream>
+#include<cstdio>
+#include<queue>
+using namespace std;
+const int N=1e5+5;
+const int M=2e5+5;
+const int INF=2e9+7;
+
+int l[N],x[M],w[M],e[M];
+int f[N],vst[N];
+priority_queue<pair<int,int> >q;
+
+void bfs(int s)
+{
+	int i,v;
+	f[s]=0;
+	q.push(make_pair(-f[s],s)); 
+	while(1){
+		v=0;
+		while(!q.empty()&&(!v||vst[v])){v=q.top().second;q.pop();}
+		if(!v)break;
+		vst[v]=1;
+		for(i=l[v];i;i=x[i])
+			if(f[v]+w[i]<f[e[i]]){
+				f[e[i]]=f[v]+w[i];
+				q.push(make_pair(-f[e[i]],e[i]));
+			}
+	}
+}
+
+int main()
+{
+	int n,m,i,u,s;
+	scanf("%d%d%d",&n,&m,&s);
+	for(i=1;i<=m;i++){
+		scanf("%d%d%d",&u,&e[i],&w[i]);
+		x[i]=l[u];l[u]=i;
+	}
+	for(i=1;i<=n;i++)
+		f[i]=INF;
+	bfs(s);
+	for(i=1;i<=n;i++)
+		printf("%d ",f[i]);
+	return 0;
+}
