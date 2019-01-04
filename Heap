@@ -1,0 +1,65 @@
+//heap
+//LuoguP3378
+#include<iostream>
+#include<cstdio>
+using namespace std;
+const int N=1e6+6;
+
+struct heap{
+    int h[N],tp;
+    int w[N],l[N];
+    heap(){tp=1;}
+    void swp(int x,int y){
+        swap(l[h[x]],l[h[y]]);
+        swap(h[x],h[y]);
+    }
+    void up(int v){
+        int f=v>>1;
+        while(f&&w[h[f]]>w[h[v]]){
+            swp(f,v);v=f;
+            f=v>>1;
+        }
+    }
+    void dwn(int v){
+        int l=v<<1,r=l+1;
+        while(l<tp&&w[h[v]]>w[h[l]]||r<tp&&w[h[v]]>w[h[r]]){
+            if(r<tp&&w[h[r]]<w[h[l]]){swp(v,r);v=r;}
+            else {swp(v,l);v=l;}
+            l=v<<1,r=l+1;
+        }
+    }
+    void psh(int v,int c){
+        l[v]=tp;h[tp]=v;w[v]=c;
+        up(tp);++tp;
+    }
+    int dl(int v){
+        --tp;swp(v,tp);
+        up(v);dwn(v);
+        return w[h[tp]];
+    }
+    int dlmn(){
+        return dl(1);
+    }
+    int mn(){
+        return w[h[1]];
+    }
+}hp;
+
+int main()
+{
+    int n,i,o,x;
+    scanf("%d",&n);
+    for(i=1;i<=n;i++){
+        scanf("%d",&o);
+        if(o==1){
+            scanf("%d",&x);
+            hp.psh(i,x);
+        }
+        if(o==2){
+            printf("%d\n",hp.mn());
+        }
+        if(o==3){
+            hp.dlmn();
+        }
+    }
+}
