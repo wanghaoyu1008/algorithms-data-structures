@@ -8,17 +8,18 @@ const int S=10504;
 const int N=152;
 const int L0=1e6+1;
 const int L=71;
+const int X=26;
 
 struct acm{
 	int cnt,hd,tl;
-	int nxt[S][26],fl[S],sm[S],q[S],ps[N];
+	int nxt[S][X],fl[S],sm[S],q[S],ps[N];
 	char ch[N][L],str[L0];
 	void clear(){
 		cnt=1;
 		int i;
 		memset(nxt,0,sizeof(nxt));
 		memset(sm,0,sizeof(sm));
-		for(i=0;i<26;i++)
+		for(i=0;i<X;i++)
 			nxt[0][i]=1;
 	}
 	void insrt(int t){
@@ -37,7 +38,7 @@ struct acm{
 		int nw,i,v;
 		while(hd!=tl){
 			nw=q[hd];++hd;
-			for(i=0;i<26;i++){
+			for(i=0;i<X;i++){
 				v=nxt[nw][i];
 				if(v){
 					fl[v]=nxt[fl[nw]][i];
