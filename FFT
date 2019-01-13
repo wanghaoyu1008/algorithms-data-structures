@@ -1,0 +1,60 @@
+//FFT
+//LuoguP1919
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+using namespace std;
+const int N=(1<<17)+1;
+const double PI=acos(-1.0);
+
+struct cmplx{					//complex
+	double a,b;
+	cmplx operator+(cmplx x){return (cmplx){a+x.a,b+x.b};}
+	cmplx operator-(cmplx x){return (cmplx){a-x.a,b-x.b};}
+	cmplx operator*(cmplx x){return (cmplx){a*x.a-b*x.b,a*x.b+b*x.a};}
+}a[N],b[N];
+int l,L,R[N],la,lb;
+char x[N],y[N];
+int ans[N],ls;
+
+void fft(cmplx f[],int t){		//if(t==1)fft;if(t==-1)ifft;
+	int i,j,k;
+	cmplx w,o,nx,ny;
+	for(i=0;i<l;i++)if(i<R[i])swap(f[i],f[R[i]]);
+	for(j=1;j<l;j<<=1){
+		w=(cmplx){cos(PI/ j),t*sin(PI/j)};
+		for(i=0;i<l;i+=(j<<1)){
+			o=(cmplx){1,0};
+            for(k=0;k<j;k++,o=o*w){
+                nx=f[i+k];ny=o*f[i+j+k];
+                f[i+k]=nx+ny;f[i+j+k]=nx-ny;
+            }
+		}
+	}
+	if(t==-1)for(i=0;i<l;i++)f[i].a/=l,f[i].b/=l;
+}
+void init(){
+	l=1;while(l<la+lb)l<<=1,++L;
+	for(int i=0;i<l;i++)R[i]=(R[i>>1]>>1)|((i&1)<<(L-1));
+}
+
+int main()
+{
+	int i,n;
+	scanf("%d%s%s",&n,x,y);
+	la=strlen(x);lb=strlen(y);
+	for(i=0;i<la;i++)a[la-1-i].a=x[i]-'0';
+	for(i=0;i<lb;i++)b[lb-1-i].a=y[i]-'0';
+	init();fft(a,1);fft(b,1);
+	for(i=0;i<l;i++)a[i]=a[i]*b[i];
+	fft(a,-1);
+	for(i=0;i<l;i++){
+		ans[i]+=(int)(a[i].a+0.5);
+		ans[i+1]=ans[i]/10;ans[i]%=10;
+		if(ans[l+1])++l;
+	}
+	while(l&&!ans[l])--l;
+	for(i=l;i>=0;i--)printf("%d",ans[i]);
+	return 0;
+}
