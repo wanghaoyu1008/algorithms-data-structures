@@ -1,0 +1,144 @@
+//mincost_maxflow
+//LuoguP3381
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+using namespace std;
+const int N=5003;
+const int M=1e5+5;
+const int INF=1e9+7;
+
+struct graph{
+	int S,T,ans,cnt;
+	int l[N],x[M],e[M],f[M],v[M],d[N];
+	int mrk[N],q[N];
+	graph(){cnt=1;}
+	void pshe(int p,int q,int w,int c){
+		++cnt;x[cnt]=l[p];l[p]=cnt;e[cnt]=q;v[cnt]=w;f[cnt]=c;
+		++cnt;x[cnt]=l[q];l[q]=cnt;e[cnt]=p;v[cnt]=-w;f[cnt]=0;
+	}
+	bool spfa(){
+		memset(mrk,0,sizeof(mrk));
+		int i,nw,hd=0,tl=1;
+		for(i=1;i<=N;i++)d[i]=INF;
+		q[0]=T;mrk[T]=1;d[T]=0;
+		while(hd!=tl){
+			nw=q[hd];++hd;if(hd==N)hd=0;
+			for(i=l[nw];i;i=x[i])
+				if(f[i^1]&&d[nw]+v[i^1]<d[e[i]]){
+					d[e[i]]=d[nw]+v[i^1];
+					if(!mrk[e[i]]){mrk[e[i]]=1;q[tl]=e[i];++tl;if(tl==N)tl=0;}
+				}
+			mrk[nw]=0;
+		}
+		return d[S]!=INF;
+	}
+	int dfs(int u,int c){
+		int w=0,t,i;mrk[u]=1;
+		if(u==T)return c;
+		for(i=l[u];i;i=x[i])
+			if(d[e[i]]==d[u]-v[i]&&f[i]&&!mrk[e[i]]){
+				t=c-w;t=dfs(e[i],min(t,f[i]));
+				ans+=t*v[i];f[i]-=t;f[i^1]+=t;
+				w+=t;if(w==c)return c;
+			}
+		return w;
+	}
+	void slv(int x,int y,int &sum,int &res){
+		S=x;T=y;sum=0;ans=0;
+		while(spfa()){
+			mrk[T]=1;
+			while(mrk[T]){
+				memset(mrk,0,sizeof(mrk));
+				sum+=dfs(S,INF);
+			}
+		}
+		res=ans;
+	}
+}g;
+
+int main()
+{
+	int n,m,s,t,i,u,v,w,c,sum,ans;
+	scanf("%d%d%d%d",&n,&m,&s,&t);
+	for(i=1;i<=m;i++){
+		scanf("%d%d%d%d",&u,&v,&c,&w);
+		g.pshe(u,v,w,c);
+	}
+	g.slv(s,t,sum,ans);
+	printf("%d %d",sum,ans);
+	return 0;
+}
+
+//maxcost_maxflow
+/*
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+using namespace std;
+const int N=5003;
+const int M=1e5+5;
+const int INF=1e9+7;
+
+struct graph{
+	int S,T,ans,cnt;
+	int l[N],x[M],e[M],f[M],v[M],d[N];
+	int mrk[N],q[N];
+	graph(){cnt=1;}
+	void pshe(int p,int q,int w,int c){
+		++cnt;x[cnt]=l[p];l[p]=cnt;e[cnt]=q;v[cnt]=w;f[cnt]=c;
+		++cnt;x[cnt]=l[q];l[q]=cnt;e[cnt]=p;v[cnt]=-w;f[cnt]=0;
+	}
+	bool spfa(){
+		memset(mrk,0,sizeof(mrk));
+		memset(d,-1,sizeof(d));
+		int i,nw,hd=0,tl=1;
+		q[0]=T;mrk[T]=1;d[T]=0;
+		while(hd!=tl){
+			nw=q[hd];++hd;if(hd==N)hd=0;
+			for(i=l[nw];i;i=x[i])
+				if(f[i^1]&&d[nw]+v[i^1]>d[e[i]]){
+					d[e[i]]=d[nw]+v[i^1];
+					if(!mrk[e[i]]){mrk[e[i]]=1;q[tl]=e[i];++tl;if(tl==N)tl=0;}
+				}
+			mrk[nw]=0;
+		}
+		return d[S]!=-1;
+	}
+	int dfs(int u,int c){
+		int w=0,t,i;mrk[u]=1;
+		if(u==T)return c;
+		for(i=l[u];i;i=x[i])
+			if(d[e[i]]==d[u]-v[i]&&f[i]&&!mrk[e[i]]){
+				t=c-w;t=dfs(e[i],min(t,f[i]));
+				ans+=t*v[i];f[i]-=t;f[i^1]+=t;
+				w+=t;if(w==c)return c;
+			}
+		return w;
+	}
+	void slv(int x,int y,int &sum,int &res){
+		S=x;T=y;sum=0;ans=0;
+		while(spfa()){
+			mrk[T]=1;
+			while(mrk[T]){
+				memset(mrk,0,sizeof(mrk));
+				sum+=dfs(S,INF);
+			}
+		}
+		res=ans;
+	}
+}g;
+
+int main()
+{
+	int n,m,s,t,i,u,v,w,c,sum,ans;
+	scanf("%d%d%d%d",&n,&m,&s,&t);
+	for(i=1;i<=m;i++){
+		scanf("%d%d%d%d",&u,&v,&c,&w);
+		g.pshe(u,v,w,c);
+	}
+	g.slv(s,t,sum,ans);
+	printf("%d %d",sum,ans);
+	return 0;
+}
+*/
