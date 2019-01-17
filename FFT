@@ -23,7 +23,7 @@ void fft(cmplx f[],int t){		//if(t==1)fft;if(t==-1)ifft;
 	cmplx w,o,nx,ny;
 	for(i=0;i<l;i++)if(i<R[i])swap(f[i],f[R[i]]);
 	for(j=1;j<l;j<<=1){
-		w=(cmplx){cos(PI/ j),t*sin(PI/j)};
+		w=(cmplx){cos(PI/j),t*sin(PI/j)};
 		for(i=0;i<l;i+=(j<<1)){
 			o=(cmplx){1,0};
             for(k=0;k<j;k++,o=o*w){
