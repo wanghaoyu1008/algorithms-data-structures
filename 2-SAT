@@ -1,0 +1,46 @@
+//2-SAT
+//LuoguP4782
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+using namespace std;
+const int N=1e6+6;
+
+int a[N];
+int l[N][2],e[2*N][2],x[2*N],cnt;
+
+void pshe(int u,int bu,int v,int bv){
+	++cnt;x[cnt]=l[u][bu];l[u][bu]=cnt;
+	e[cnt][0]=v;e[cnt][1]=bv;
+}
+
+bool dfs(int v,int c){
+	if(a[v]!=-1)return a[v]==c;
+	a[v]=c;
+	for(int i=l[v][c];i;i=x[i])
+		if(!dfs(e[i][0],e[i][1])){
+			a[v]=-1;
+			return 0;
+		}
+	return 1;
+}
+
+int main()
+{
+	int n,m,i,u,bu,v,bv;
+	scanf("%d%d",&n,&m);
+	for(i=1;i<=m;i++){
+		scanf("%d%d%d%d",&u,&bu,&v,&bv);
+		pshe(u,bu^1,v,bv);
+		pshe(v,bv^1,u,bu);
+	}
+	memset(a,-1,sizeof(a));
+	for(i=1;i<=n;i++)
+		if(!dfs(i,0)&&!dfs(i,1)){
+			printf("IMPOSSIBLE\n");
+			return 0; 
+		}
+	printf("POSSIBLE\n");
+	for(i=1;i<=n;i++)printf("%d ",a[i]);
+	return 0;
+}
