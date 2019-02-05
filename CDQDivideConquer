@@ -1,0 +1,77 @@
+//cdq divide conquer
+//LuoguP3810
+#include<iostream>
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+const int N=1e5+5;
+
+struct node{
+	int x,y,z,b,s;
+	int *ans;
+	bool operator<(const node a)const{
+		return x<a.x||x==a.x&&(y<a.y||y==a.y&&z<a.z);
+	}
+	bool operator==(const node a)const{
+		return x==a.x&&y==a.y&&z==a.z;
+	}
+}a[N],b[N],c[N];
+int ans[N];
+int n,m;
+int res[N];
+
+void DC3(int l,int r){
+	if(l==r)return;
+	int i,j,k,mid=(l+r)>>1,cnt;
+	DC3(l,mid);DC3(mid+1,r);
+	for(i=l,j=l,k=mid+1,cnt=0;i<=r;i++)
+		if(j<=mid&&(k>r||b[j].z<=b[k].z))c[i]=b[j++],cnt+=c[i].b*c[i].s;
+		else c[i]=b[k++],*(c[i].ans)+=(c[i].b^1)*cnt;
+	for(i=l;i<=r;i++)b[i]=c[i];
+}
+
+/*
+void DCn(int l,int r){//Divide and Conquer
+	if(l==r)return;
+	int i,j,k,mid=(l+r)>>1;
+	DCn(l,mid);DCn(mid+1,r);
+	for(i=l,j=l,k=mid+1;i<=r;i++)
+		if(j<=mid&&(k>r||a[j].y<=a[k].y))b[i]=a[j++],b[i].b=a[i].b;
+		else b[i]=a[k++],b[i].b=0;
+	for(i=l;i<=r;i++)a[i]=b[i];
+	DC3(l,r);
+}
+*/
+
+void DC2(int l,int r){//Divide and Conquer
+	if(l==r)return;
+	int i,j,k,mid=(l+r)>>1;
+	DC2(l,mid);DC2(mid+1,r);
+	for(i=l,j=l,k=mid+1;i<=r;i++)
+		if(j<=mid&&(k>r||a[j].y<=a[k].y))b[i]=a[j++],b[i].b=1;
+		else b[i]=a[k++],b[i].b=0;
+	for(i=l;i<=r;i++)a[i]=b[i];
+	DC3(l,r);
+}
+
+int main()
+{
+	int i,k;
+	scanf("%d%d",&n,&k);
+	for(i=1;i<=n;i++)
+		scanf("%d%d%d",&a[i].x,&a[i].y,&a[i].z);
+	for(i=0;i<=n;i++){
+		a[i].s=1;a[i].ans=&ans[i];
+	}
+	sort(a+1,a+n+1);
+	for(i=1,m=0;i<=n;i++)
+		if(a[i]==a[m])a[i].ans=a[m].ans,++a[m].s,++*(a[m].ans);
+		else a[++m]=a[i];
+	DC2(1,m);
+	for(i=1;i<=m;i++)
+		res[*(a[i].ans)]+=a[i].s;
+	//for(i=1;i<=m;i++)printf("%d %d %d %d\n",a[i].x,a[i].y,a[i].z,*(a[i].ans));
+	for(i=0;i<n;i++)
+		printf("%d\n",res[i]);
+	return 0;
+}
