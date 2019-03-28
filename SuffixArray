@@ -1,0 +1,55 @@
+//LuoguP3809
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+using namespace std;
+const int N=1e6+6;
+
+int t1[N],t2[N],c[N];
+int sa[N],rk[N],ht[N];
+char s[N];
+
+void mksa(int n,int m){
+    int *x=t1,*y=t2,p=0,k,i;
+    for(i=1;i<=n;i++)++c[x[i]=s[i]];
+    for(i=2;i<=m;i++)c[i]+=c[i-1];
+    for(i=n;i;i--)sa[c[x[i]]--]=i;
+    for(k=1;k<=n&&p<n;k<<=1){
+        p=0;
+        for(i=n-k+1;i<=n;i++)y[++p]=i;
+        //空串 
+        for(i=1;i<=n;i++)if(sa[i]>k)y[++p]=sa[i]-k;
+        //第一关键字偏移k位 
+        for(i=1;i<=m;i++)c[i]=0;
+        for(i=1;i<=n;i++)++c[x[y[i]]];
+        for(i=2;i<=m;i++)c[i]+=c[i-1];
+        for(i=n;i;i--)sa[c[x[y[i]]]--]=y[i];
+        //y:第二关键字排序 
+        //x:第一关键字 
+        swap(x,y);
+        x[sa[1]]=1;p=1;
+        for(i=2;i<=n;i++)
+            x[sa[i]]=y[sa[i]]==y[sa[i-1]]&&y[sa[i]+k]==y[sa[i-1]+k]?p:++p;
+        //第一、二关键字 对应相等就是相同 
+        m=p;
+    }
+    for(i=1;i<=n;i++)rk[sa[i]]=i;
+    //h[rk[i]]>=h[rk[i-1]]-1
+    p=1;
+    for(i=1;i<=n;i++){
+        k=sa[rk[i]-1];
+        --p;while(s[i+p]==s[k+p])++p;
+        ht[rk[i]]=p;
+    }
+}
+
+int main()
+{
+    scanf("%s",s+1);
+    int l=strlen(s+1);
+    mksa(l,127);
+    for(int i=1;i<=l;i++)
+        printf("%d ",sa[i]);
+    return 0;
+}
