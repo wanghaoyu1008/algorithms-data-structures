@@ -39,7 +39,8 @@ void mksa(int n,int m){
     p=1;
     for(i=1;i<=n;i++){
         k=sa[rk[i]-1];
-        --p;while(s[i+p]==s[k+p])++p;
+        if(p)--p;
+        while(s[i+p]==s[k+p])++p;
         ht[rk[i]]=p;
     }
 }
